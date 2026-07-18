@@ -1,0 +1,79 @@
+{
+  "name": "Taha Mohi Ud Din Rather",
+  "email": "rathertaha788@gmail.com",
+  "phone": "+91 6005298476",
+  "location": "Kerala",
+  "linkedin": "",
+  "github": "",
+  "leetcode": "",
+  "summary": "AI and automation-focused CSE student building production-grade projects in LangGraph, LLM pipelines, n8n workflows, and health-tech applications. Seeking part-time internships where I can contribute to real agentic AI systems.",
+  "education": [
+    {
+      "degree": "B.Tech, Computer Science & Engineering",
+      "institution": "College of Engineering Trivandrum",
+      "year": "2024 - 2028"
+    }
+  ],
+  "certifications": [
+    {
+      "name": "MOOC 101 — Qualifying Certificate",
+      "issuer": "NASSCOM Future Skills, Virtual",
+      "date": "Apr 2025 - Nov 2025",
+      "description": "Fundamentals of digital technology and emerging tech concepts."
+    }
+  ],
+  "projects": [
+    {
+      "name": "Leaderbolt AI Operational Review System",
+      "date": "Jul 2026",
+      "description": "Two-agent LangGraph pipeline that scrapes Wikipedia and generates structured operational reviews for any tech company.",
+      "tech": ["LangGraph", "LangChain", "Groq API", "LLaMA 3.3 70B"]
+    },
+    {
+      "name": "currency-converter",
+      "date": "Apr 2026 - Jul 2026",
+      "description": "A responsive currency converter web app with live exchange rates using the Fawazahmed0 API, supporting INR and 150+ currencies.",
+      "tech": ["HTML", "CSS", "JavaScript"]
+    },
+    {
+      "name": "MediVault-AI",
+      "date": "May 2026 - Jun 2026",
+      "description": "AI-powered personal medical assistant for storing patient records, tracking vitals, uploading reports, and generating intelligent health insights using LLM-based reasoning.",
+      "tech": ["LangGraph", "LLM"]
+    },
+    {
+      "name": "Zeus-chatbot",
+      "date": "Mar 2026",
+      "description": "Command-line AI chatbot built with Groq API and LLaMA. Supports multi-turn conversational memory and context-aware personalized responses.",
+      "tech": ["Groq API", "LLaMA"]
+    },
+    {
+      "name": "Hackathon-tracker-n8n",
+      "date": "Feb 2026",
+      "description": "Self-hosted n8n automation pipeline that discovers hackathons across platforms, filters relevant ones using AI (Groq/LLaMA + Serper API), and delivers a curated Gmail digest.",
+      "tech": ["n8n", "Groq", "LLaMA", "Serper API"]
+    },
+    {
+      "name": "Haven",
+      "date": "Jun 2026 - Present",
+      "description": "AI-powered emotional companion for cancer patients featuring real-time empathetic chat, mood tracking dashboard, and a legacy vault for personal reflections.",
+      "tech": ["LLM", "LangGraph"]
+    }
+  ],
+  "skills": {
+    "languages": ["Python", "Java", "JavaScript", "HTML", "CSS", "Bash", "SQL", "C Programming"],
+    "frameworks": ["LangChain", "LangGraph", "REST API"],
+    "tools": ["Git", "Grok", "Generative AI Tools", "Linux", "Prompt Engineering", "LLM evaluation", "Automation", "Vibe Coding", "n8n"]
+  },
+  "extracurricular": [
+    "Member of ISTE Design Club, CET — contributing to UI/UX design and club branding for 1+ year.",
+    "Active marathon runner — participated in college and inter-college running events.",
+    "Participant in college cultural fests — fashion shows and mentoring/leadership sessions."
+  ],
+  "additional": [
+    "Actively building production-grade Agentic AI and LLM-powered applications in health-tech, targeting real-world impact.",
+    "Completed Task 2 assignment for Leaderbolt (Houston, US) — built a multi-agent LangGraph pipeline as part of internship selection process.",
+    "Actively learning Data Structures and Algorithms in Java.",
+    "Open to part-time and remote internships in AI, automation, and health-tech."
+  ]
+}
