@@ -6,7 +6,7 @@ load_dotenv()
 
 llm = ChatGroq(model="llama-3.3-70b-versatile")
 
-def match_profile(profile: dict, jd_analysis: dict) ->dict:
+def match_profile(profile: dict, jd_analysis: dict) -> dict:
     prompt = f"""
     You are a resume expert. Given a candidate's profile and a job analysis,
     select and reframe the most relevant experiences and skills.
@@ -24,5 +24,13 @@ def match_profile(profile: dict, jd_analysis: dict) ->dict:
 
     Return ONLY valid JSON, no explanation, no markdown, no backticks.
     """
+
     response = llm.invoke(prompt)
-    return json.loads(response.content)
+    raw = response.content.strip()
+
+    if raw.startswith("```"):
+        raw = raw.split("```")[1]
+        if raw.startswith("json"):
+            raw = raw[4:]
+
+    return json.loads(raw.strip())
