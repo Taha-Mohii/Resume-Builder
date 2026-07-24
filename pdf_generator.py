@@ -16,7 +16,7 @@ def generate_pdf(resume: dict, output_path: str = "output/resume.pdf"):
         pagesize=A4,
         rightMargin=right_margin,
         leftMargin=left_margin,
-        topMargin=12*mm,
+        topMargin=8*mm,
         bottomMargin=12*mm
     )
 
@@ -25,11 +25,10 @@ def generate_pdf(resume: dict, output_path: str = "output/resume.pdf"):
     # --- CUSTOM STYLES ---
     name_style = ParagraphStyle("name", fontSize=18, fontName="Helvetica-Bold", alignment=TA_CENTER, spaceAfter=8)
     contact_style = ParagraphStyle("contact", fontSize=9, fontName="Helvetica", alignment=TA_CENTER, spaceAfter=6)
-    section_style = ParagraphStyle("section", fontSize=11, fontName="Helvetica-Bold", textColor=colors.HexColor("#2E4057"), spaceBefore=8, spaceAfter=3)
-    body_style = ParagraphStyle("body", fontSize=9, fontName="Helvetica", spaceAfter=2, leading=13)
-    bullet_style = ParagraphStyle("bullet", fontSize=9, fontName="Helvetica", leftIndent=10, spaceAfter=2, leading=13)
-    job_title_style = ParagraphStyle("job_title", fontSize=10, fontName="Helvetica-Bold", spaceAfter=1)
-
+    section_style = ParagraphStyle("section", fontSize=10, fontName="Helvetica-Bold", textColor=colors.HexColor("#2E4057"), spaceBefore=5, spaceAfter=2)
+    body_style = ParagraphStyle("body", fontSize=8.5, fontName="Helvetica", spaceAfter=1, leading=12)
+    bullet_style = ParagraphStyle("bullet", fontSize=8.5, fontName="Helvetica", leftIndent=10, spaceAfter=1, leading=12)
+    job_title_style = ParagraphStyle("job_title", fontSize=9.5, fontName="Helvetica-Bold", spaceAfter=1)
     def add_section_title(title):
         story.append(Paragraph(title.upper(), section_style))
         story.append(Table([[""]], colWidths=[usable_width], style=TableStyle([
@@ -42,18 +41,18 @@ def generate_pdf(resume: dict, output_path: str = "output/resume.pdf"):
     story.append(Paragraph(header["name"], name_style))
     contact = f'{header["email"]}  |  {header["phone"]}  |  {header["location"]}'
     story.append(Paragraph(contact, contact_style))
-    story.append(Spacer(1, 3*mm))
+    story.append(Spacer(1, 2*mm))
 
     # --- SUMMARY ---
     add_section_title("Career Objective")
     story.append(Paragraph(resume["summary"], body_style))
-    story.append(Spacer(1, 2*mm))
+    story.append(Spacer(1, 1*mm))
 
     # --- SKILLS ---
     add_section_title("Skills")
     skills_text = "  •  ".join(resume["skills"])
     story.append(Paragraph(skills_text, body_style))
-    story.append(Spacer(1, 2*mm))
+    story.append(Spacer(1, 1*mm))
 
     # --- EXPERIENCE ---
     add_section_title("Experience")
@@ -70,7 +69,7 @@ def generate_pdf(resume: dict, output_path: str = "output/resume.pdf"):
         story.append(t)
         for b in exp["bullets"]:
             story.append(Paragraph(f"• {b}", bullet_style))
-        story.append(Spacer(1, 2*mm))
+        story.append(Spacer(1, 1*mm))
 
     # --- PROJECTS ---
     add_section_title("Projects")
@@ -79,7 +78,7 @@ def generate_pdf(resume: dict, output_path: str = "output/resume.pdf"):
         story.append(Paragraph(f'<b>{proj["name"]}</b> — <i>{tech}</i>', body_style))
         for b in proj["bullets"]:
             story.append(Paragraph(f"• {b}", bullet_style))
-        story.append(Spacer(1, 2*mm))
+        story.append(Spacer(1, 1*mm))
 
     # --- EDUCATION ---
     add_section_title("Education")
@@ -95,7 +94,7 @@ def generate_pdf(resume: dict, output_path: str = "output/resume.pdf"):
         ]))
         story.append(t)
         story.append(Paragraph(edu["institution"], body_style))
-        story.append(Spacer(1, 2*mm))
+        story.append(Spacer(1, 0.5*mm))
 
     doc.build(story)
     print(f"PDF saved to {output_path}")
