@@ -3,6 +3,8 @@ from xhtml2pdf import pisa
 import os
 
 def generate_pdf(resume: dict, template: str = "classic", output_path: str = "output/resume.pdf"):
+    os.makedirs("output", exist_ok=True)
+    
     env = Environment(loader=FileSystemLoader("templates"))
     tmpl = env.get_template(f"{template}.html")
     html_content = tmpl.render(resume=resume)
