@@ -2,7 +2,7 @@ langchain-groq
 langchain
 langgraph
 python-dotenv
-reportlab
 streamlit
 jinja2
 xhtml2pdf
+reportlab
