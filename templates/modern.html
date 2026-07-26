@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: Arial, sans-serif; font-size: 11px; color: #222; }
+
+  .header {
+    background-color: #1B2A4A;
+    padding: 12mm 18mm 8mm 18mm;
+    text-align: center;
+  }
+  .header h1 { font-size: 22px; color: #FFFFFF; margin-bottom: 4px; }
+  .header p { font-size: 10px; color: #AABBCC; }
+
+  .body { padding: 6mm 18mm; }
+
+  .section { margin-top: 8px; margin-bottom: 4px; }
+
+  .section-title {
+    font-size: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #2E86AB;
+    border-bottom: 1px solid #2E86AB;
+    padding-bottom: 2px;
+    margin-bottom: 5px;
+  }
+
+  p { line-height: 1.5; }
+
+  .exp-item { margin-bottom: 5px; }
+  .proj-item { margin-bottom: 5px; }
+  .edu-item { margin-bottom: 5px; }
+
+  .row { width: 100%; }
+  .row td { vertical-align: top; }
+  .row .left { font-weight: bold; font-size: 11px; color: #1B2A4A; }
+  .row .right { text-align: right; font-size: 10px; color: #555; }
+
+  ul { margin-left: 14px; margin-top: 2px; }
+  ul li { line-height: 1.5; color: #333; }
+
+  .proj-name { font-weight: bold; color: #1B2A4A; }
+  .proj-tech { font-style: italic; color: #555; }
+  .inst { color: #444; font-size: 10px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <table width="100%" style="background-color: #1B2A4A; padding: 0;">
+  <tr>
+    <td style="text-align: center; padding: 10mm 18mm 4mm 18mm;">
+      <p style="font-size: 22px; font-weight: bold; color: #FFFFFF;">{{ resume.header.name }}</p>
+    </td>
+  </tr>
+  <tr>
+    <td style="text-align: center; padding: 0mm 18mm 8mm 18mm;">
+      <p style="font-size: 10px; color: #AABBCC;">{{ resume.header.email }} | {{ resume.header.phone }} | {{ resume.header.location }}</p>
+    </td>
+  </tr>
+</table>
+</div>
+
+<div class="body">
+
+  <div class="section">
+    <div class="section-title">Career Objective</div>
+    <p>{{ resume.summary }}</p>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Skills</div>
+    <p>{{ resume.skills | join(' &nbsp;•&nbsp; ') }}</p>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Experience</div>
+    {% for exp in resume.experience %}
+    <div class="exp-item">
+      <table class="row" width="100%">
+        <tr>
+          <td class="left">{{ exp.title }}</td>
+          <td class="right">{{ exp.duration }}</td>
+        </tr>
+      </table>
+      <ul>
+        {% for bullet in exp.bullets %}
+        <li>{{ bullet }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="section">
+    <div class="section-title">Projects</div>
+    {% for proj in resume.projects %}
+    <div class="proj-item">
+      <span class="proj-name">{{ proj.name }}</span>
+      <span class="proj-tech"> — {{ proj.tech | join(', ') }}</span>
+      <ul>
+        {% for bullet in proj.bullets %}
+        <li>{{ bullet }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="section">
+    <div class="section-title">Education</div>
+    {% for edu in resume.education %}
+    <div class="edu-item">
+      <table class="row" width="100%">
+        <tr>
+          <td class="left">{{ edu.degree }}</td>
+          <td class="right">{{ edu.year }}</td>
+        </tr>
+      </table>
+      <p class="inst">{{ edu.institution }}</p>
+    </div>
+    {% endfor %}
+  </div>
+
+</div>
+</body>
+</html>

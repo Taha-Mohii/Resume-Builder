@@ -5,21 +5,29 @@ from agents.profile_matcher import match_profile
 from agents.resume_builder import build_resume
 from pdf_generator import generate_pdf
 
+# Load profile
 with open("data/profile.json", "r") as f:
     profile = json.load(f)
 
-st.set_page_config(page_title="Resume Builder", page_icon="📄", layout="centered")
+# --- PAGE CONFIG ---
+st.set_page_config(page_title="AI Resume Builder", page_icon="📄", layout="centered")
 
 st.title("📄 AI Resume Builder")
-st.markdown("Paste a job description below and get a tailored resume in seconds.")
+st.markdown("Paste a job description and get a tailored resume in seconds.")
 
-# --- INPUT ---
+# --- INPUTS ---
 jd = st.text_area("Job Description", placeholder="Paste the job description here...", height=250)
 
+template = st.selectbox(
+    "Choose a resume template",
+    options=["classic", "modern", "minimal"],
+    format_func=lambda x: x.capitalize()
+)
+
+# --- GENERATE BUTTON ---
 if st.button("Generate Resume", type="primary"):
     if not jd.strip():
         st.warning("Please paste a job description first.")
-
     else:
         with st.spinner("Agent 1 — Analyzing job description..."):
             jd_analysis = analyze_jd(jd)
@@ -31,14 +39,14 @@ if st.button("Generate Resume", type="primary"):
             resume = build_resume(profile, matched)
 
         with st.spinner("Generating PDF..."):
-            generate_pdf(resume)
-        st.success("Resume Generated..!")
+            generate_pdf(resume, template=template)
 
+        st.success("Resume generated!")
 
-        with open("output/resume.pdf", "rb")as f:
+        with open("output/resume.pdf", "rb") as f:
             st.download_button(
-                label="Download Resume PDF.",
+                label="⬇️ Download Resume PDF",
                 data=f,
-                file_name="tailored_resume.pdf",
+                file_name=f"resume_{template}.pdf",
                 mime="application/pdf"
             )

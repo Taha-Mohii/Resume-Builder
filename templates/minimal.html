@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: Arial, sans-serif; font-size: 11px; color: #222; padding: 14mm 20mm; }
+
+  a { color: inherit; text-decoration: none; }
+
+  .header { margin-bottom: 10px; border-bottom: 2px solid #222; padding-bottom: 6px; }
+  .header h1 { font-size: 24px; font-weight: bold; color: #111; margin-bottom: 3px; }
+  .header p { font-size: 10px; color: #555; }
+
+  .section { margin-top: 10px; }
+  .section-title {
+    font-size: 9px; font-weight: bold; text-transform: uppercase;
+    letter-spacing: 2px; color: #888;
+    border-bottom: 0.5px solid #ccc; padding-bottom: 2px; margin-bottom: 5px;
+  }
+
+  p { line-height: 1.5; color: #333; }
+
+  .exp-item { margin-bottom: 5px; }
+  .proj-item { margin-bottom: 5px; }
+  .edu-item { margin-bottom: 5px; }
+
+  .row td { vertical-align: top; }
+  .left { font-weight: bold; font-size: 11px; color: #111; }
+  .right { text-align: right; font-size: 10px; color: #777; }
+
+  ul { margin-left: 14px; margin-top: 2px; }
+  ul li { line-height: 1.5; color: #333; list-style-type: none; }
+  ul li { line-height: 1.5; color: #333; list-style-type: disc; }
+  .proj-name { font-weight: bold; color: #111; }
+  .proj-tech { font-style: italic; color: #666; }
+  .inst { color: #555; font-size: 10px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>{{ resume.header.name }}</h1>
+  <p>{{ resume.header.email }} &nbsp;|&nbsp; {{ resume.header.phone }} &nbsp;|&nbsp; {{ resume.header.location }}</p>
+</div>
+
+<div class="section">
+  <div class="section-title">Objective</div>
+  <p>{{ resume.summary }}</p>
+</div>
+
+<div class="section">
+  <div class="section-title">Skills</div>
+  <p>{{ resume.skills | join(' &nbsp;·&nbsp; ') }}</p>
+</div>
+
+<div class="section">
+  <div class="section-title">Experience</div>
+  {% for exp in resume.experience %}
+  <div class="exp-item">
+    <table class="row" width="100%">
+      <tr>
+        <td class="left">{{ exp.title }}</td>
+        <td class="right">{{ exp.duration }}</td>
+      </tr>
+    </table>
+    <ul>
+      {% for bullet in exp.bullets %}
+      <li>{{ bullet }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endfor %}
+</div>
+
+<div class="section">
+  <div class="section-title">Projects</div>
+  {% for proj in resume.projects %}
+  <div class="proj-item">
+    <span class="proj-name">{{ proj.name }}</span>
+    <span class="proj-tech"> — {{ proj.tech | join(', ') }}</span>
+    <ul>
+      {% for bullet in proj.bullets %}
+      <li>{{ bullet }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endfor %}
+</div>
+
+<div class="section">
+  <div class="section-title">Education</div>
+  {% for edu in resume.education %}
+  <div class="edu-item">
+    <table class="row" width="100%">
+      <tr>
+        <td class="left">{{ edu.degree }}</td>
+        <td class="right">{{ edu.year }}</td>
+      </tr>
+    </table>
+    <p class="inst">{{ edu.institution }}</p>
+  </div>
+  {% endfor %}
+</div>
+
+</body>
+</html>

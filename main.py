@@ -1,39 +1,26 @@
+
 from agents.jd_analyser import analyze_jd
 from agents.profile_matcher import match_profile
 from agents.resume_builder import build_resume
 from pdf_generator import generate_pdf
 import json
 
+# Load profile
 with open("data/profile.json", "r") as f:
     profile = json.load(f)
 
 jd = """
-We are looking for a Python developer with experience in REST APIs, 
-machine learning, and cloud deployment. The candidate should be familiar 
-with FastAPI, Docker, and have good communication skills. Experience with 
-LLMs or AI pipelines is a plus.
+We are seeking a Machine Learning Engineer Intern to join our AI team. 
+The ideal candidate should have experience with Python, LLMs, and building 
+AI pipelines. Familiarity with LangChain or LangGraph is a strong plus. 
+You will be working on developing and deploying NLP models, integrating 
+REST APIs, and contributing to our health-tech AI products.
 """
 
-#agent 1
-
-print("Running Agent 1 - JD Analyzer...")
+print("Running agents...")
 jd_analysis = analyze_jd(jd)
-print("Done.")
-print()
-
-#Agent 2
-print("Running Agent 2 - Profile Matcher...")
 matched = match_profile(profile, jd_analysis)
-print("Done.")
-print()
-
-#Agent 3
-print("Running Agent 3 - Resume Builder...")
 resume = build_resume(profile, matched)
-print("Done.")
 
-print("Generating PDF...")
-try:
-    generate_pdf(resume)
-except Exception as e:
-    print(f"pdf error: {e}")
+print("Generating modern PDF...")
+generate_pdf(resume, template="minimal")
