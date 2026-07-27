@@ -6,3 +6,4 @@ streamlit
 jinja2
 xhtml2pdf
 reportlab
+supabase

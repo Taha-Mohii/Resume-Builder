@@ -5,6 +5,16 @@ from agents.jd_analyser import analyze_jd
 from agents.profile_matcher import match_profile
 from agents.resume_builder import build_resume
 from pdf_generator import generate_pdf
+from supabase import create_client
+from dotenv import load_dotenv
+
+load_dotenv()
+
+# --- SUPABASE CLIENT ---
+supabase = create_client(
+    os.getenv("SUPABASE_URL"),
+    os.getenv("SUPABASE_KEY")
+)
 
 st.set_page_config(page_title="AI Resume Builder", page_icon="📄", layout="centered")
 
@@ -12,35 +22,71 @@ st.set_page_config(page_title="AI Resume Builder", page_icon="📄", layout="cen
 if "profile" not in st.session_state:
     st.session_state.profile = None
 if "page" not in st.session_state:
-    st.session_state.page = "profile"
+    st.session_state.page = "login"
+
+
+def login_page():
+    st.title("📄 AI Resume Builder")
+    st.markdown("Enter your email to load your profile or create a new one.")
+
+    email = st.text_input("Email Address")
+
+    if st.button("Continue", type="primary"):
+        if not email.strip():
+            st.warning("Please enter your email.")
+        else:
+            # Check if profile exists
+            result = supabase.table("resume").select("*").eq("email", email).execute()
+            if result.data:
+                # Load existing profile
+                profile = json.loads(result.data[0]["profile_data"])
+                st.session_state.profile = profile
+                st.session_state.email = email
+                st.session_state.page = "resume"
+                st.rerun()
+            else:
+                # New user — go to profile setup
+                st.session_state.email = email
+                st.session_state.page = "profile"
+                st.rerun()
+
 
 def profile_page():
     st.title("👤 Set Up Your Profile")
-    st.markdown("Fill in your details once. We'll use this to tailor your resume every time.")
+    st.markdown("Fill in your details once. We'll save them for next time.")
+
+    p = st.session_state.profile or {}
+    h = p.get("header", {})
 
     with st.form("profile_form"):
         st.subheader("Basic Info")
-        name = st.text_input("Full Name")
-        email = st.text_input("Email")
-        phone = st.text_input("Phone")
-        location = st.text_input("Location")
-        linkedin = st.text_input("LinkedIn URL (optional)")
-        github = st.text_input("GitHub URL (optional)")
-        summary = st.text_area("Career Summary / Objective", height=100)
+        name = st.text_input("Full Name", value=h.get("name", ""))
+        email = st.text_input("Email", value=st.session_state.get("email", ""))
+        phone = st.text_input("Phone", value=h.get("phone", ""))
+        location = st.text_input("Location", value=h.get("location", ""))
+        linkedin = st.text_input("LinkedIn URL (optional)", value=h.get("linkedin", ""))
+        github = st.text_input("GitHub URL (optional)", value=h.get("github", ""))
+        summary = st.text_area("Career Summary / Objective", value=p.get("summary", ""), height=100)
 
         st.subheader("Skills")
-        languages = st.text_input("Programming Languages (comma separated)", placeholder="Python, Java, JavaScript")
-        frameworks = st.text_input("Frameworks & Libraries (comma separated)", placeholder="LangGraph, FastAPI, React")
-        tools = st.text_input("Tools & Platforms (comma separated)", placeholder="Git, Docker, VS Code")
+        existing_skills = ", ".join(p.get("skills", []))
+        languages = st.text_input("Programming Languages (comma separated)", value=existing_skills)
+        frameworks = st.text_input("Frameworks & Libraries (comma separated)")
+        tools = st.text_input("Tools & Platforms (comma separated)")
 
         st.subheader("Education")
-        degree = st.text_input("Degree")
-        institution = st.text_input("Institution")
-        edu_year = st.text_input("Year (e.g. 2024 - 2028)")
+        edu = p.get("education", [{}])[0] if p.get("education") else {}
+        degree = st.text_input("Degree", value=edu.get("degree", ""))
+        institution = st.text_input("Institution", value=edu.get("institution", ""))
+        edu_year = st.text_input("Year (e.g. 2024 - 2028)", value=edu.get("year", ""))
 
         st.subheader("Experience / Projects")
-        st.markdown("Add your projects and experience as bullet points. Format: **Title | Date | bullet1; bullet2; bullet3**")
-        projects_raw = st.text_area("Projects & Experience", height=200, placeholder="Leaderbolt AI | Jul 2026 | Built a LangGraph pipeline; Used Groq API; Deployed on cloud\nHaven | Jun 2026 - Present | Built AI companion; Used LLMs; Integrated mood tracking")
+        st.markdown("Format: **Title | Date | bullet1; bullet2; bullet3**")
+        existing_projects = ""
+        for proj in p.get("projects", []):
+            bullets = "; ".join(proj.get("bullets", []))
+            existing_projects += f'{proj["name"]} | {proj.get("date", "")} | {bullets}\n'
+        projects_raw = st.text_area("Projects & Experience", value=existing_projects.strip(), height=200)
 
         submitted = st.form_submit_button("Save Profile & Continue", type="primary")
 
@@ -48,7 +94,6 @@ def profile_page():
             if not name or not email:
                 st.warning("Please fill in at least your name and email.")
             else:
-                # Parse skills
                 all_skills = []
                 if languages:
                     all_skills += [s.strip() for s in languages.split(",")]
@@ -57,7 +102,6 @@ def profile_page():
                 if tools:
                     all_skills += [s.strip() for s in tools.split(",")]
 
-                # Parse projects
                 projects = []
                 experience = []
                 if projects_raw:
@@ -79,14 +123,15 @@ def profile_page():
                                 "bullets": bullets
                             })
 
-                # Build profile
                 profile = {
-                    "name": name,
-                    "email": email,
-                    "phone": phone,
-                    "location": location,
-                    "linkedin": linkedin,
-                    "github": github,
+                    "header": {
+                        "name": name,
+                        "email": email,
+                        "phone": phone,
+                        "location": location,
+                        "linkedin": linkedin,
+                        "github": github
+                    },
                     "summary": summary,
                     "skills": all_skills,
                     "education": [{
@@ -99,18 +144,37 @@ def profile_page():
                     "certifications": []
                 }
 
+                # Save to Supabase
+                existing = supabase.table("resume").select("*").eq("email", email).execute()
+                if existing.data:
+                    supabase.table("resume").update({
+                        "profile_data": json.dumps(profile)
+                    }).eq("email", email).execute()
+                else:
+                    supabase.table("resume").insert({
+                        "email": email,
+                        "profile_data": json.dumps(profile)
+                    }).execute()
+
                 st.session_state.profile = profile
+                st.session_state.email = email
                 st.session_state.page = "resume"
                 st.rerun()
+
 
 def resume_page():
     st.title("📄 AI Resume Builder")
     st.markdown("Paste a job description and get a tailored resume in seconds.")
 
     with st.sidebar:
-        st.markdown(f"👤 **{st.session_state.profile['name']}**")
+        st.markdown(f"👤 **{st.session_state.profile['header']['name']}**")
+        st.markdown(f"📧 {st.session_state.email}")
         if st.button("Edit Profile"):
             st.session_state.page = "profile"
+            st.rerun()
+        if st.button("Logout"):
+            st.session_state.profile = None
+            st.session_state.page = "login"
             st.rerun()
 
     jd = st.text_area("Job Description", placeholder="Paste the job description here...", height=250)
@@ -147,7 +211,9 @@ def resume_page():
                     mime="application/pdf"
                 )
 
-if st.session_state.page == "profile":
+if st.session_state.page == "login":
+    login_page()
+elif st.session_state.page == "profile":
     profile_page()
 else:
     resume_page()
