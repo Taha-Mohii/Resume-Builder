@@ -10,7 +10,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# --- SUPABASE CLIENT ---
 supabase = create_client(
     os.getenv("SUPABASE_URL"),
     os.getenv("SUPABASE_KEY")
@@ -111,10 +110,11 @@ def profile_page():
                             title = parts[0].strip()
                             date = parts[1].strip()
                             bullets = [b.strip() for b in parts[2].split(";")]
+                            tech = [t.strip() for t in parts[3].split(",")] if len(parts) >= 4 else []
                             projects.append({
                                 "name": title,
                                 "date": date,
-                                "tech": [],
+                                "tech": tech,
                                 "bullets": bullets
                             })
                             experience.append({
@@ -122,7 +122,6 @@ def profile_page():
                                 "duration": date,
                                 "bullets": bullets
                             })
-
                 profile = {
                     "header": {
                         "name": name,
