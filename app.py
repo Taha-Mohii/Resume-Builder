@@ -17,7 +17,6 @@ supabase = create_client(
 
 st.set_page_config(page_title="AI Resume Builder", page_icon="📄", layout="centered")
 
-# --- SESSION STATE INIT ---
 if "profile" not in st.session_state:
     st.session_state.profile = None
 if "page" not in st.session_state:
@@ -34,17 +33,14 @@ def login_page():
         if not email.strip():
             st.warning("Please enter your email.")
         else:
-            # Check if profile exists
             result = supabase.table("resume").select("*").eq("email", email).execute()
             if result.data:
-                # Load existing profile
                 profile = json.loads(result.data[0]["profile_data"])
                 st.session_state.profile = profile
                 st.session_state.email = email
                 st.session_state.page = "resume"
                 st.rerun()
             else:
-                # New user — go to profile setup
                 st.session_state.email = email
                 st.session_state.page = "profile"
                 st.rerun()
@@ -80,11 +76,16 @@ def profile_page():
         edu_year = st.text_input("Year (e.g. 2024 - 2028)", value=edu.get("year", ""))
 
         st.subheader("Experience / Projects")
-        st.markdown("Format: **Title | Date | bullet1; bullet2; bullet3**")
+        st.markdown("Format: **Title | Date | bullet1; bullet2 | Tech1, Tech2 | https://github.com/...**")
+
+        # Pre-fill WITH tech and github
         existing_projects = ""
         for proj in p.get("projects", []):
             bullets = "; ".join(proj.get("bullets", []))
-            existing_projects += f'{proj["name"]} | {proj.get("date", "")} | {bullets}\n'
+            tech = ", ".join(proj.get("tech", []))
+            github_link = proj.get("github", "")
+            existing_projects += f'{proj["name"]} | {proj.get("date", "")} | {bullets} | {tech} | {github_link}\n'
+
         projects_raw = st.text_area("Projects & Experience", value=existing_projects.strip(), height=200)
 
         submitted = st.form_submit_button("Save Profile & Continue", type="primary")
@@ -111,17 +112,20 @@ def profile_page():
                             date = parts[1].strip()
                             bullets = [b.strip() for b in parts[2].split(";")]
                             tech = [t.strip() for t in parts[3].split(",")] if len(parts) >= 4 else []
+                            github_link = parts[4].strip() if len(parts) >= 5 else ""
                             projects.append({
                                 "name": title,
                                 "date": date,
                                 "tech": tech,
-                                "bullets": bullets
+                                "bullets": bullets,
+                                "github": github_link
                             })
                             experience.append({
                                 "title": title,
                                 "duration": date,
                                 "bullets": bullets
                             })
+
                 profile = {
                     "header": {
                         "name": name,
@@ -143,7 +147,6 @@ def profile_page():
                     "certifications": []
                 }
 
-                # Save to Supabase
                 existing = supabase.table("resume").select("*").eq("email", email).execute()
                 if existing.data:
                     supabase.table("resume").update({
@@ -197,6 +200,24 @@ def resume_page():
             with st.spinner("Agent 3 — Building your resume..."):
                 resume = build_resume(st.session_state.profile, matched)
 
+                # Restore github links from original profile
+                profile_projects = {p["name"].lower().strip(): p.get("github", "") for p in st.session_state.profile.get("projects", [])}
+                for proj in resume.get("projects", []):
+                    proj_name_lower = proj["name"].lower().strip()
+                    if proj_name_lower in profile_projects:
+                        proj["github"] = profile_projects[proj_name_lower]
+                    else:
+                        for key, link in profile_projects.items():
+                            if key in proj_name_lower or proj_name_lower in key:
+                                proj["github"] = link
+                                break
+                        else:
+                            proj["github"] = ""
+
+                # Debug
+                for proj in resume.get("projects", []):
+                    print(f"{proj['name']} -> {proj.get('github', 'EMPTY')}")
+
             with st.spinner("Generating PDF..."):
                 generate_pdf(resume, template=template)
 
@@ -209,6 +230,7 @@ def resume_page():
                     file_name=f"resume_{template}.pdf",
                     mime="application/pdf"
                 )
+
 
 if st.session_state.page == "login":
     login_page()

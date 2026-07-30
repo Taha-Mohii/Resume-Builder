@@ -38,8 +38,10 @@
     <h1>{{ resume.header.name }}</h1>
     <div class="contact">
       {{ resume.header.email }} | {{ resume.header.phone }} | {{ resume.header.location }}
+      {% if resume.header.linkedin %} | <a href="{{ resume.header.linkedin }}">LinkedIn</a>{% endif %}
+      {% if resume.header.github %} | <a href="{{ resume.header.github }}">GitHub</a>{% endif %}
     </div>
-  </div>
+</div>
 
   <div class="section summary">
     <div class="section-title">Career Objective</div>
@@ -72,9 +74,11 @@
     <div class="section-title">Projects</div>
     {% for proj in resume.projects %}
     <div class="proj-item">
-      <span class="proj-name">{{ proj.name }}</span>
-      <span class="proj-tech"> — {{ proj.tech | join(', ') }}</span>
-      <ul>
+     <span class="proj-name">
+      {% if proj.github %}<a href="{{ proj.github }}" style="color: inherit;">{{ proj.name }}</a>
+      {% else %}{{ proj.name }}{% endif %}
+      </span>
+      <span class="proj-tech"> — {{ proj.tech | join(', ') }}</span>     <ul>
         {% for bullet in proj.bullets %}
         <li>{{ bullet }}</li>
         {% endfor %}
